@@ -114,8 +114,7 @@ def login():
         if user:
             session['user_id'] = user['id']
             return redirect(url_for('dashboard'))
-        else:
-            # AQUI MUDOU: Passa o erro direto para a variável, não via flash
+        else:            
             error = 'Email ou senha incorretos'
             
     return render_template_string(login_html, error=error)
@@ -135,7 +134,7 @@ def register():
             flash('Cadastro realizado! Faça login.')
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
-            # AQUI MUDOU: Passa o erro direto
+            
             error = 'Erro: Este email já está cadastrado'
             return render_template_string(register_html, error=error)
         except Exception as e:
