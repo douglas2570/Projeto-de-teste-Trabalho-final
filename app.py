@@ -28,73 +28,117 @@ def init_db():
     except Exception as e:
         print(f"Erro ao iniciar DB: {e}")
 
-# --- HTML Templates (Com suporte a erro direto) ---
-login_html = """
+# --- HTML Templates  ---
+
+# Estilo Base (CSS)
+base_style = """
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background-color: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
+    h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
+    input { width: 100%; padding: 10px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; background-color: #4CAF50; color: white; padding: 12px 20px; margin: 8px 0; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+    button:hover { background-color: #45a049; }
+    .btn-danger { background-color: #f44336; }
+    .btn-danger:hover { background-color: #d32f2f; }
+    .alert { padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
+    .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    a { display: block; text-align: center; margin-top: 10px; color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    label { font-size: 0.9rem; color: #666; font-weight: bold; margin-top: 10px; display: block; }
+</style>
+"""
+
+login_html = f"""
 <!DOCTYPE html>
 <html>
-<head><title>Login</title></head>
+<head><title>Login</title>{base_style}</head>
 <body>
-    <h2>Login do Sistema</h2>
-    
-    {% if error %}
-        <div style="color: red;">{{ error }}</div>
-    {% endif %}
-    
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}<div style="color: green;">{{ messages[0] }}</div>{% endif %}
-    {% endwith %}
+    <div class="container">
+        <h2>Login do Sistema</h2>
+        
+        {{% if error %}}
+            <div class="alert alert-error">{{{{ error }}}}</div>
+        {{% endif %}}
+        
+        {{% with messages = get_flashed_messages() %}}
+            {{% if messages %}}<div class="alert alert-success">{{{{ messages[0] }}}}</div>{{% endif %}}
+        {{% endwith %}}
 
-    <form method="POST" action="/">
-        Email: <input type="email" name="email" required><br>
-        Senha: <input type="password" name="password" required><br>
-        <button type="submit">Entrar</button>
-    </form>
-    <br><a href="/register">Cadastrar nova conta</a>
+        <form method="POST" action="/">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="exemplo@email.com" required>
+            
+            <label>Senha</label>
+            <input type="password" name="password" placeholder="Sua senha" required>
+            
+            <button type="submit">Entrar</button>
+        </form>
+        <a href="/register">Criar nova conta</a>
+    </div>
 </body>
 </html>
 """
 
-register_html = """
+register_html = f"""
 <!DOCTYPE html>
 <html>
-<head><title>Cadastro</title></head>
+<head><title>Cadastro</title>{base_style}</head>
 <body>
-    <h2>Cadastro de Usuário</h2>
-    
-    {% if error %}
-        <div style="color: red;">{{ error }}</div>
-    {% endif %}
+    <div class="container">
+        <h2>Criar Conta</h2>
+        
+        {{% if error %}}
+            <div class="alert alert-error">{{{{ error }}}}</div>
+        {{% endif %}}
 
-    <form method="POST" action="/register">
-        Nome: <input type="text" name="name" required><br>
-        Email: <input type="email" name="email" required><br>
-        Senha: <input type="password" name="password" required><br>
-        <button type="submit">Cadastrar</button>
-    </form>
-    <br><a href="/">Voltar ao Login</a>
+        <form method="POST" action="/register">
+            <label>Nome Completo</label>
+            <input type="text" name="name" placeholder="Seu nome" required>
+            
+            <label>Email</label>
+            <input type="email" name="email" placeholder="exemplo@email.com" required>
+            
+            <label>Senha</label>
+            <input type="password" name="password" placeholder="Crie uma senha" required>
+            
+            <button type="submit">Cadastrar</button>
+        </form>
+        <a href="/">Já tenho conta (Login)</a>
+    </div>
 </body>
 </html>
 """
 
-dashboard_html = """
+dashboard_html = f"""
 <!DOCTYPE html>
 <html>
-<head><title>Dashboard</title></head>
+<head><title>Dashboard</title>{base_style}</head>
 <body>
-    <h2>Bem-vindo, {{ user['name'] }}!</h2>
-    <p>Seu Email: {{ user['email'] }}</p>
-    <hr>
-    <h3>Editar Dados</h3>
-    <form method="POST" action="/edit">
-        Novo Nome: <input type="text" name="name" value="{{ user['name'] }}" required><br>
-        Nova Senha: <input type="password" name="password" placeholder="Nova senha"><br>
-        <button type="submit">Atualizar</button>
-    </form>
-    <hr>
-    <h3>Zona de Perigo</h3>
-    <a href="/delete" onclick="return confirm('Tem certeza que deseja excluir sua conta?')"><button style="color:red;">Excluir Conta</button></a>
-    <hr>
-    <a href="/logout">Sair</a>
+    <div class="container">
+        <h2>Olá, {{{{ user['name'] }}}}!</h2>
+        <p style="text-align:center; color:#666;">Logado como: <strong>{{{{ user['email'] }}}}</strong></p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <h3 style="text-align:center; color:#333;">Editar Perfil</h3>
+        <form method="POST" action="/edit">
+            <label>Alterar Nome</label>
+            <input type="text" name="name" value="{{{{ user['name'] }}}}" required>
+            
+            <label>Alterar Senha (Opcional)</label>
+            <input type="password" name="password" placeholder="Nova senha (deixe em branco para manter)">
+            
+            <button type="submit" style="background-color: #2196F3;">Atualizar Dados</button>
+        </form>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <a href="/delete" onclick="return confirm('Tem certeza? Essa ação não pode ser desfeita!')">
+            <button class="btn-danger">Excluir Minha Conta</button>
+        </a>
+        <a href="/logout" style="color: #666;">Sair do Sistema</a>
+    </div>
 </body>
 </html>
 """
